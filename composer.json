@@ -45,6 +45,7 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.15",
+        "phpunit/php-code-coverage": "^7.0",
         "symfony/debug-bundle": "^4.3",
         "symfony/profiler-pack": "^1.0"
     },

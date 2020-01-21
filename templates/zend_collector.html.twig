@@ -1,0 +1,161 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        <svg width="256px" height="124px" viewBox="0 0 256 124" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+            <g fill="#6FB643">
+                <path d="M120.429511,36.0206222 C120.429511,36.0206222 120.429511,2.2016 154.249244,2.2016 L255.7056,2.2016 C255.7056,2.2016 255.7056,36.0206222 221.886578,36.0206222 L120.429511,36.0206222"></path>
+                <path d="M120.429511,79.2334222 C120.429511,79.2334222 120.429511,45.4144 154.249244,45.4144 L204.977067,45.4144 C204.977067,45.4144 204.977067,79.2334222 171.157333,79.2334222 L120.429511,79.2334222"></path>
+                <path d="M120.429511,122.446222 C120.429511,122.446222 120.429511,88.6279111 154.249244,88.6279111 L171.157333,88.6279111 C171.157333,88.6279111 171.157333,122.446222 137.339733,122.446222 L120.429511,122.446222"></path>
+                <path d="M109.075911,96.0547556 L109.075911,123.034311 L0.32,123.034311 L70.3800889,27.4666667 L10.2357333,27.4666667 L10.2357333,0.485688889 L123.692089,0.485688889 L53.9555556,96.0547556 L109.075911,96.0547556"></path>
+            </g>
+        </svg>
+        <span class="sf-toolbar-value">Zend</span>
+    {% endset %}
+
+    {% set text %}
+        <div class="sf-toolbar-info-piece">
+            <b>Controller</b>
+            <span>{{ collector.controller }}::{{ collector.action }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Zend Score</b>
+            <span class="sf-toolbar-status">17</span>
+        </div>
+    {% endset %}
+
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true }) }}
+{% endblock %}
+
+{% block head %}
+    {{ parent() }}
+{% endblock %}
+
+{% block menu %}
+    {% if collector.controller is not empty %}
+        <span class="label">
+            <span class="icon">
+                <svg width="256px" height="124px" viewBox="0 0 256 124" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+                    <g fill="#6FB643">
+                        <path d="M120.429511,36.0206222 C120.429511,36.0206222 120.429511,2.2016 154.249244,2.2016 L255.7056,2.2016 C255.7056,2.2016 255.7056,36.0206222 221.886578,36.0206222 L120.429511,36.0206222"></path>
+                        <path d="M120.429511,79.2334222 C120.429511,79.2334222 120.429511,45.4144 154.249244,45.4144 L204.977067,45.4144 C204.977067,45.4144 204.977067,79.2334222 171.157333,79.2334222 L120.429511,79.2334222"></path>
+                        <path d="M120.429511,122.446222 C120.429511,122.446222 120.429511,88.6279111 154.249244,88.6279111 L171.157333,88.6279111 C171.157333,88.6279111 171.157333,122.446222 137.339733,122.446222 L120.429511,122.446222"></path>
+                        <path d="M109.075911,96.0547556 L109.075911,123.034311 L0.32,123.034311 L70.3800889,27.4666667 L10.2357333,27.4666667 L10.2357333,0.485688889 L123.692089,0.485688889 L53.9555556,96.0547556 L109.075911,96.0547556"></path>
+                    </g>
+                </svg>
+            </span>
+            <strong>Zend</strong>
+        </span>
+    {% endif %}
+{% endblock %}
+
+{% block panel %}
+    <h2>Zend</h2>
+    <div class="metrics">
+        <div class="metric">
+            <span class="value">17</span>
+            <span class="label">Zend Score</span>
+        </div>
+
+        <div class="metric">
+            <span class="value">5</span>
+            <span class="label">Doctrine1 Score</span>
+        </div>
+    </div>
+
+    <h3>Zend Runtime</h3>
+    <table>
+        <thead>
+        <tr>
+            <th scope="col" class="key">Name</th>
+            <th scope="col">Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th scope="row">Controller</th>
+            <td>{{ collector.controller }}::{{ collector.action }}</td>
+        </tr>
+        <tr>
+            <th scope="row">Models</th>
+            <td>
+                <ul>
+                    <li>...</li>
+                    <li>...</li>
+                    <li>...</li>
+                </ul>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h3>Code Execution</h3>
+    <table>
+        <tbody>
+        {% for file, lines in collector.coverage %}
+            <tr>
+                <th>{{ file }}</th>
+            </tr>
+            <tr>
+                <td>
+                    {{ file|file_coverage(lines) }}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {#<table>
+        <tr>
+            <th>File</th>
+        </tr>
+        {% for file,lines in collector.coverage %}
+            <tr>
+                <td>{{ file }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <div class="trace trace-as-html" id="trace-box">
+        <div class="trace-details">
+            <div class="trace-head">
+            <span class="sf-toggle" data-toggle-selector="#trace-html" data-toggle-initial="display">
+                <h3 class="trace-class">
+                    <span class="trace-namespace">
+                        Controller: {{ collector.controller }}::{{ collector.action }}
+                    </span>
+                </h3>
+
+            </span>
+            </div>
+
+            <div id="trace-html" class="sf-toggle-content">
+                {% set _is_first_user_code = true %}
+                {% for file, lines in collector.coverage %}
+                    {% set _is_vendor_file = file is not empty and ('/vendor/' in file or '/var/cache/' in file) %}
+                    {% set _display_code_snippet = _is_first_user_code and not _is_vendor_file %}
+                    {% if _display_code_snippet %}{% set _is_first_user_code = false %}{% endif %}
+                    <div class="trace-line {{ _is_vendor_file ? 'trace-from-vendor' }}">
+                        <div class="trace-line-header break-long-words {{ file|default(false) ? 'sf-toggle' }}" data-toggle-selector="#trace-html-{{ loop.index }}" data-toggle-initial="expanded">
+
+                            {% set line_number = lines|keys.0 %}
+                            {% set file_link = file|file_link(line_number) %}
+                            {% set file_path = file|format_file(line_number)|striptags|replace({ (' at line ' ~ line_number): '' }) %}
+                            {% set file_path_parts = file_path|split(constant('DIRECTORY_SEPARATOR')) %}
+
+                        </div>
+                        <div id="trace-html-{{ loop.index }}" class="trace-code sf-toggle-content">
+                            {{ file|file_excerpt(line_number)|replace({
+                                '#DD0000': 'var(--highlight-string)',
+                                '#007700': 'var(--highlight-keyword)',
+                                '#0000BB': 'var(--highlight-default)',
+                                '#FF8000': 'var(--highlight-comment)'
+                            })|raw }}
+                        </div>
+
+
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>#}
+
+{% endblock %}
