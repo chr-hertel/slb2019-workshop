@@ -27,8 +27,8 @@ class CoverageZendBridge implements ZendBridgeInterface
     public function executeZend(Request $request, string $controller, string $action): Response
     {
         $filter = new Filter();
-        $filter->addDirectoryToWhitelist($this->projectDirectory.'/library');
-        $filter->addDirectoryToWhitelist($this->projectDirectory.'/application');
+        $filter->addDirectoryToWhitelist($this->projectDirectory.DIRECTORY_SEPARATOR.'library');
+        $filter->addDirectoryToWhitelist($this->projectDirectory.DIRECTORY_SEPARATOR.'application');
 
         $driver = new Xdebug($filter);
         $coverage = new CodeCoverage($driver);
@@ -38,8 +38,8 @@ class CoverageZendBridge implements ZendBridgeInterface
         $response = $this->zendBridge->executeZend($request, $controller, $action);
 
         $this->coverage = array_filter($coverage->stop(), function (string $file) {
-            return 0 === stripos($file, $this->projectDirectory.'/library')
-                || 0 === stripos($file, $this->projectDirectory.'/application');
+            return 0 === stripos($file, $this->projectDirectory.DIRECTORY_SEPARATOR.'library')
+                || 0 === stripos($file, $this->projectDirectory.DIRECTORY_SEPARATOR.'application');
         }, ARRAY_FILTER_USE_KEY);
 
         $this->controller = $controller;
