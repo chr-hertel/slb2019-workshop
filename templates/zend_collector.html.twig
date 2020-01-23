@@ -19,8 +19,16 @@
             <span>{{ collector.controller }}::{{ collector.action }}</span>
         </div>
         <div class="sf-toolbar-info-piece">
+            <b>Doctrine1 Score</b>
+            <span class="sf-toolbar-status">n/a</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
             <b>Zend Score</b>
-            <span class="sf-toolbar-status">17</span>
+            <span class="sf-toolbar-status">n/a</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Legacy Source</b>
+            <span class="sf-toolbar-status">{{ collector.coverage|length }}</span>
         </div>
     {% endset %}
 
