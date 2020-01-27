@@ -19,15 +19,15 @@
             <span>{{ collector.controller }}::{{ collector.action }}</span>
         </div>
         <div class="sf-toolbar-info-piece">
-            <b>Doctrine1 Score</b>
-            <span class="sf-toolbar-status">n/a</span>
-        </div>
-        <div class="sf-toolbar-info-piece">
             <b>Zend Score</b>
-            <span class="sf-toolbar-status">n/a</span>
+            <span class="sf-toolbar-status">{{ collector.zendScore }}</span>
         </div>
         <div class="sf-toolbar-info-piece">
-            <b>Legacy Source</b>
+            <b>Doctrine1 Score</b>
+            <span class="sf-toolbar-status">{{ collector.doctrineScore }}</span>
+        </div>
+        <div class="sf-toolbar-info-piece">
+            <b>Legacy Source Files</b>
             <span class="sf-toolbar-status">{{ collector.coverage|length }}</span>
         </div>
     {% endset %}
@@ -37,6 +37,12 @@
 
 {% block head %}
     {{ parent() }}
+    <style>
+        li { margin-bottom: 0; }
+        th span { vertical-align: middle; }
+        .icon { line-height: 10px; cursor: pointer; }
+        .icon-close, .source { display: none; }
+    </style>
 {% endblock %}
 
 {% block menu %}
@@ -52,59 +58,110 @@
                     </g>
                 </svg>
             </span>
-            <strong>Zend</strong>
+            <strong>Zend Application</strong>
         </span>
     {% endif %}
 {% endblock %}
 
 {% block panel %}
-    <h2>Zend</h2>
+    <h2>Zend Application</h2>
     <div class="metrics">
         <div class="metric">
-            <span class="value">17</span>
+            <span class="value">{{ collector.controller }}</span>
+            <span class="label">Controller</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.action }}</span>
+            <span class="label">Action</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.zendScore }}</span>
             <span class="label">Zend Score</span>
         </div>
-
         <div class="metric">
-            <span class="value">5</span>
+            <span class="value">{{ collector.doctrineScore }}</span>
             <span class="label">Doctrine1 Score</span>
+        </div>
+        <div class="metric">
+            <span class="value">{{ collector.coverage|length }}</span>
+            <span class="label">Legacy Source Files</span>
         </div>
     </div>
 
-    <h3>Zend Runtime</h3>
+    <h3>Layer</h3>
     <table>
         <thead>
         <tr>
-            <th scope="col" class="key">Name</th>
-            <th scope="col">Value</th>
+            <th scope="col" class="key">Layer</th>
+            <th scope="col">Files</th>
         </tr>
         </thead>
         <tbody>
         <tr>
             <th scope="row">Controller</th>
-            <td>{{ collector.controller }}::{{ collector.action }}</td>
+            <td>
+                <ul>
+                    {% for file,lines in collector.controllerFiles %}
+                        <li>{{ file }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
         </tr>
         <tr>
             <th scope="row">Models</th>
             <td>
                 <ul>
-                    <li>...</li>
-                    <li>...</li>
-                    <li>...</li>
+                    {% for file,lines in collector.modelFiles %}
+                        <li>{{ file }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">Templates</th>
+            <td>
+                <ul>
+                    {% for file,lines in collector.templateFiles %}
+                        <li>{{ file }}</li>
+                    {% endfor %}
                 </ul>
             </td>
         </tr>
         </tbody>
     </table>
 
-    <h3>Code Execution</h3>
+    <h3>Legacy Source Files</h3>
     <table>
         <tbody>
+        <script type="application/javascript">
+            function openFile(index) {
+                document.getElementById('file-'+index).style.display = 'block';
+                document.getElementById('open-'+index).style.display = 'none';
+                document.getElementById('close-'+index).style.display = 'inline';
+            }
+            function closeFile(index) {
+                document.getElementById('file-'+index).style.display = 'none';
+                document.getElementById('open-'+index).style.display = 'inline';
+                document.getElementById('close-'+index).style.display = 'none';
+            }
+        </script>
         {% for file, lines in collector.coverage %}
             <tr>
-                <th>{{ file }}</th>
+                <th>
+                    <span id="close-{{ loop.index }}" class="icon icon-close" onclick="closeFile({{ loop.index }});">
+                        <svg width="16" height="21" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1408 960V832q0-26-19-45t-45-19H448q-26 0-45 19t-19 45v128q0 26 19 45t45 19h896q26 0 45-19t19-45zm256-544v960q0 119-84.5 203.5T1376 1664H416q-119 0-203.5-84.5T128 1376V416q0-119 84.5-203.5T416 128h960q119 0 203.5 84.5T1664 416z"></path>
+                        </svg>
+                    </span>
+                    <span id="open-{{ loop.index }}" class="icon icon-open" onclick="openFile({{ loop.index }});">
+                        <svg width="16" height="21" viewBox="0 0 1792 1792" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1408 960V832q0-26-19-45t-45-19h-320V448q0-26-19-45t-45-19H832q-26 0-45 19t-19 45v320H448q-26 0-45 19t-19 45v128q0 26 19 45t45 19h320v320q0 26 19 45t45 19h128q26 0 45-19t19-45v-320h320q26 0 45-19t19-45zm256-544v960q0 119-84.5 203.5T1376 1664H416q-119 0-203.5-84.5T128 1376V416q0-119 84.5-203.5T416 128h960q119 0 203.5 84.5T1664 416z"></path>
+                        </svg>
+                    </span>
+                    <span>{{ file }} (L{{ min(lines|keys) }}:{{ max(lines|keys) }})</span>
+                </th>
             </tr>
-            <tr>
+            <tr id="file-{{ loop.index }}" class="source">
                 <td>
                     {{ file|file_coverage(lines) }}
                 </td>
@@ -112,58 +169,5 @@
         {% endfor %}
         </tbody>
     </table>
-    {#<table>
-        <tr>
-            <th>File</th>
-        </tr>
-        {% for file,lines in collector.coverage %}
-            <tr>
-                <td>{{ file }}</td>
-            </tr>
-        {% endfor %}
-    </table>
-    <div class="trace trace-as-html" id="trace-box">
-        <div class="trace-details">
-            <div class="trace-head">
-            <span class="sf-toggle" data-toggle-selector="#trace-html" data-toggle-initial="display">
-                <h3 class="trace-class">
-                    <span class="trace-namespace">
-                        Controller: {{ collector.controller }}::{{ collector.action }}
-                    </span>
-                </h3>
-
-            </span>
-            </div>
-
-            <div id="trace-html" class="sf-toggle-content">
-                {% set _is_first_user_code = true %}
-                {% for file, lines in collector.coverage %}
-                    {% set _is_vendor_file = file is not empty and ('/vendor/' in file or '/var/cache/' in file) %}
-                    {% set _display_code_snippet = _is_first_user_code and not _is_vendor_file %}
-                    {% if _display_code_snippet %}{% set _is_first_user_code = false %}{% endif %}
-                    <div class="trace-line {{ _is_vendor_file ? 'trace-from-vendor' }}">
-                        <div class="trace-line-header break-long-words {{ file|default(false) ? 'sf-toggle' }}" data-toggle-selector="#trace-html-{{ loop.index }}" data-toggle-initial="expanded">
-
-                            {% set line_number = lines|keys.0 %}
-                            {% set file_link = file|file_link(line_number) %}
-                            {% set file_path = file|format_file(line_number)|striptags|replace({ (' at line ' ~ line_number): '' }) %}
-                            {% set file_path_parts = file_path|split(constant('DIRECTORY_SEPARATOR')) %}
-
-                        </div>
-                        <div id="trace-html-{{ loop.index }}" class="trace-code sf-toggle-content">
-                            {{ file|file_excerpt(line_number)|replace({
-                                '#DD0000': 'var(--highlight-string)',
-                                '#007700': 'var(--highlight-keyword)',
-                                '#0000BB': 'var(--highlight-default)',
-                                '#FF8000': 'var(--highlight-comment)'
-                            })|raw }}
-                        </div>
-
-
-                    </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>#}
 
 {% endblock %}

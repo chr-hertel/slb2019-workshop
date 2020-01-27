@@ -10,6 +10,13 @@ use Twig\TwigFunction;
 
 class FileExtension extends AbstractExtension
 {
+    private $projectDirectory;
+
+    public function __construct(string $projectDirectory)
+    {
+        $this->projectDirectory = $projectDirectory;
+    }
+
     /**
      * @uses FileExtension::getFileLines()
      */
@@ -22,6 +29,8 @@ class FileExtension extends AbstractExtension
 
     public function getFileCoverage(string $file, array $highlightLines): string
     {
+        $file = $this->projectDirectory.DIRECTORY_SEPARATOR.$file;
+
         if (!is_file($file) || !is_readable($file)) {
             return '';
         }
@@ -41,13 +50,14 @@ class FileExtension extends AbstractExtension
         $content = explode('<br />', $code);
 
         $lines = [];
+        $start = max($lineStart - 5, 1);
         $end = min($lineEnd + 5, count($content));
-        for ($i = max($lineStart - 5, 1); $i <= $end; ++$i) {
+        for ($i = $start; $i <= $end; ++$i) {
             $bgHighlight = array_key_exists($i, $highlightLines) && 1 === $highlightLines[$i] ? ' style="background: #EEEE88"' : '';
             $lines[] = '<li><a class="anchor" name="line'.$i.'"></a><code '.$bgHighlight.'>'.$this->fixCodeMarkup($content[$i - 1]).'</code></li>';
         }
 
-        return '<ol start="'.($lineStart - 5).'">'.implode("\n", $lines).'</ol>';
+        return '<ol start="'.$start.'">'.implode("\n", $lines).'</ol>';
     }
 
     private function fixCodeMarkup($line)

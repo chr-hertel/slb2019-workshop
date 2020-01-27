@@ -21,6 +21,8 @@ class DataCollector extends BaseCollector
     {
         $this->data = [
             'coverage' => $this->zendBridge->getCoverage(),
+            'zend_score' => $this->zendBridge->getZendScore(),
+            'doctrine_score' => $this->zendBridge->getDoctrineScore(),
             'controller' => $this->zendBridge->getController(),
             'action' => $this->zendBridge->getAction(),
         ];
@@ -34,6 +36,37 @@ class DataCollector extends BaseCollector
     public function getCoverage(): array
     {
         return $this->data['coverage'];
+    }
+
+    public function getControllerFiles(): array
+    {
+        return array_filter($this->data['coverage'], static function (string $file) {
+            return false !== stripos($file, 'controllers');
+        }, ARRAY_FILTER_USE_KEY);
+    }
+
+    public function getModelFiles(): array
+    {
+        return array_filter($this->data['coverage'], static function (string $file) {
+            return false !== stripos($file, 'models');
+        }, ARRAY_FILTER_USE_KEY);
+    }
+
+    public function getTemplateFiles(): array
+    {
+        return array_filter($this->data['coverage'], static function (string $file) {
+            return false !== stripos($file, '.phtml');
+        }, ARRAY_FILTER_USE_KEY);
+    }
+
+    public function getZendScore(): int
+    {
+        return $this->data['zend_score'];
+    }
+
+    public function getDoctrineScore(): int
+    {
+        return $this->data['doctrine_score'];
     }
 
     public function getController(): string

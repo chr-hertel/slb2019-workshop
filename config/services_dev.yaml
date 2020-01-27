@@ -3,11 +3,6 @@ services:
         autowire: true
         autoconfigure: true
 
-#    TravelOrganizer\Zend\TraceableZendBridge:
-#        decorates: TravelOrganizer\Zend\ZendBridge
-#        arguments:
-#            $cacheDirectory: '%kernel.cache_dir%/xdebug'
-
     TravelOrganizer\Zend\CoverageZendBridge:
         decorates: TravelOrganizer\Zend\ZendBridge
         arguments:

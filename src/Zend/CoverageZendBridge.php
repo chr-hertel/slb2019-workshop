@@ -26,21 +26,12 @@ class CoverageZendBridge implements ZendBridgeInterface
 
     public function executeZend(Request $request, string $controller, string $action): Response
     {
-        $filter = new Filter();
-        $filter->addDirectoryToWhitelist($this->projectDirectory.DIRECTORY_SEPARATOR.'library');
-        $filter->addDirectoryToWhitelist($this->projectDirectory.DIRECTORY_SEPARATOR.'application');
-
-        $driver = new Xdebug($filter);
-        $coverage = new CodeCoverage($driver);
-
-        $coverage->start('ZendBridge');
+        xdebug_start_code_coverage();
 
         $response = $this->zendBridge->executeZend($request, $controller, $action);
 
-        $this->coverage = array_filter($coverage->stop(), function (string $file) {
-            return 0 === stripos($file, $this->projectDirectory.DIRECTORY_SEPARATOR.'library')
-                || 0 === stripos($file, $this->projectDirectory.DIRECTORY_SEPARATOR.'application');
-        }, ARRAY_FILTER_USE_KEY);
+        $this->coverage = xdebug_get_code_coverage();
+        xdebug_stop_code_coverage();
 
         $this->controller = $controller;
         $this->action = $action;
@@ -50,7 +41,36 @@ class CoverageZendBridge implements ZendBridgeInterface
 
     public function getCoverage(): array
     {
-        return $this->coverage;
+        $filtered = array_filter($this->coverage, function (string $file) {
+            return 0 === stripos($file, $this->projectDirectory.DIRECTORY_SEPARATOR.'library')
+                || 0 === stripos($file, $this->projectDirectory.DIRECTORY_SEPARATOR.'application');
+        }, ARRAY_FILTER_USE_KEY);
+
+        $data = [];
+        foreach ($filtered as $file => $values) {
+            $key = str_replace($this->projectDirectory.DIRECTORY_SEPARATOR, '', $file);
+            $data[$key] = $values;
+        }
+
+        return $data;
+    }
+
+    public function getZendScore(): int
+    {
+        $filtered = array_filter($this->coverage, static function (string $file) {
+            return false !== stripos($file, DIRECTORY_SEPARATOR.'Zend'.DIRECTORY_SEPARATOR);
+        }, ARRAY_FILTER_USE_KEY);
+
+        return count($filtered);
+    }
+
+    public function getDoctrineScore(): int
+    {
+        $filtered = array_filter($this->coverage, static function (string $file) {
+            return false !== stripos($file, DIRECTORY_SEPARATOR.'Doctrine'.DIRECTORY_SEPARATOR);
+        }, ARRAY_FILTER_USE_KEY);
+
+        return count($filtered);
     }
 
     public function getController(): string
